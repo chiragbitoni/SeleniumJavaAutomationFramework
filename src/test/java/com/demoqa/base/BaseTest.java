@@ -3,6 +3,7 @@ package com.demoqa.base;
 import com.demoqa.pages.BasePage;
 import com.demoqa.pages.HomePage;
 import com.demoqa.pages.elements.BrokenLinkImagePage;
+import com.demoqa.pages.elements.DynamicPropertiesPage;
 import com.demoqa.pages.elements.ElementsPage;
 import com.demoqa.pages.elements.LinksPage;
 import com.demoqa.pages.elements.UploadAndDownloadPage;
@@ -24,6 +25,7 @@ public class BaseTest {
     protected LinksPage linksPage;
     protected BrokenLinkImagePage brokenLinkImagePage;
     protected UploadAndDownloadPage uploadAndDownloadPage;
+    protected DynamicPropertiesPage dynamicPropertiesPage;
     private String url = "https://demoqa.com/";
 
     @BeforeClass
@@ -42,6 +44,7 @@ public class BaseTest {
         linksPage = new LinksPage();
         brokenLinkImagePage = new BrokenLinkImagePage();
         uploadAndDownloadPage = new UploadAndDownloadPage();
+        dynamicPropertiesPage = new DynamicPropertiesPage();
     }
     @Step("TearDown")
     @AfterClass

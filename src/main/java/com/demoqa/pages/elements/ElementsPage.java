@@ -8,7 +8,7 @@ import static utilities.JavaScriptUtility.scrollToElementJS;
 
 public class ElementsPage extends BasePage {
     private By elementsHeaderCard = By.xpath("//div[@class='accordion']//div[text()='Elements']");
-  //Elements cards
+    // Elements cards
     private By textBoxCard = By.xpath("//div[@class='element-group'][1]/div/ul/li[1]");
     private By checkboxCard = By.xpath("//div[@class='element-group'][1]/div/ul/li[2]");
     private By radioButtonCard = By.xpath("//div[@class='element-group'][1]/div/ul/li[3]");
@@ -17,6 +17,7 @@ public class ElementsPage extends BasePage {
     private By linksCard = By.xpath("//div[@class='element-group'][1]/div/ul/li[6]");
     private By brokenLinkImageCard = By.xpath("//div[@class='element-group'][1]/div/ul/li[7]");
     private By uploadAndDownloadCard = By.xpath("//div[@class='element-group'][1]/div/ul/li[8]");
+    private By dynamicPropertiesCard = By.xpath("//div[@class='element-group'][1]/div/ul/li[9]");
 
     public By fullNameTextField = By.id("userName");
     public By emailTextField = By.id("userEmail");
@@ -47,13 +48,14 @@ public class ElementsPage extends BasePage {
     public By searchBox = By.id("searchBox");
     public By tableItems = By.xpath("//div[@class='rt-tbody']//div[@class='rt-tr-group']/div");
     public By columnHeaders = By.xpath("//div[@class='rt-thead -header']/div/div");
-    //Buttons Page Elements
+    // Buttons Page Elements
     public By doubleClickMeButton = By.id("doubleClickBtn");
     public By rightClickMeButton = By.id("rightClickBtn");
     public By dynamicClickButton = By.xpath("//button[text()='Click Me']");
     public By doubleClickMessage = By.id("doubleClickMessage");
     public By rightClickMessage = By.id("rightClickMessage");
     public By dynamicClickMessage = By.id("dynamicClickMessage");
+
     public void clickElementsHeaderCard(){
         scrollToElementJS(elementsHeaderCard);
         click(elementsHeaderCard);
@@ -79,15 +81,19 @@ public class ElementsPage extends BasePage {
         click(buttonsCard);
     }
     public void clickLinksCard(){
-      scrollToElementJS(linksCard);
-      click(linksCard);
+        scrollToElementJS(linksCard);
+        click(linksCard);
     }
     public void clickBrokenLinkImageCard(){
-      scrollToElementJS(brokenLinkImageCard);
-      click(brokenLinkImageCard);
+        scrollToElementJS(brokenLinkImageCard);
+        click(brokenLinkImageCard);
     }
     public void clickUploadAndDownloadCard(){
-      scrollToElementJS(uploadAndDownloadCard);
-      click(uploadAndDownloadCard);
+        scrollToElementJS(uploadAndDownloadCard);
+        click(uploadAndDownloadCard);
+    }
+    public void clickDynamicPropertiesCard(){
+        scrollToElementJS(dynamicPropertiesCard);
+        click(dynamicPropertiesCard);
     }
 }

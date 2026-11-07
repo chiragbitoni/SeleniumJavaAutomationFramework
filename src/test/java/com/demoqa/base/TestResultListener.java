@@ -40,16 +40,19 @@ public class TestResultListener implements ITestListener {
         Map<String, String> testResult = new HashMap<>();
         String className = result.getTestClass().getName();
 
-        // Extract Test Name (excluding last word "Test")
+        // Extract Test Name (excluding trailing "Test")
         String testName = className.substring(className.lastIndexOf('.') + 1).replaceAll("Test$", "");
 
         // Extract Test Case ID and Description from @Test annotation
-        String testCaseId = "";
+        String testCaseId = result.getMethod().getMethodName();
         String description = "";
 
         if (result.getMethod().getDescription() != null) {
             description = result.getMethod().getDescription();
-            testCaseId = description.split(":")[0].trim(); // Assuming "TC005: Some description"
+            String[] parts = description.split(":", 2);
+            if (parts.length > 0 && !parts[0].trim().isEmpty()) {
+                testCaseId = parts[0].trim();
+            }
         }
 
         // Capture start & end time
@@ -67,52 +70,47 @@ public class TestResultListener implements ITestListener {
         testResult.put("Class", className);
         testResult.put("Description", description);
 
-        // Capture console output and exceptions
-        String consoleOutput = captureConsoleOutput();
+        // Capture error message and stack trace if failure occurred
+        String message = "No errors";
         if (result.getThrowable() != null) {
-            consoleOutput += "\nException: " + result.getThrowable().toString();
+            Throwable t = result.getThrowable();
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            t.printStackTrace(pw);
+            message = (t.getMessage() != null ? t.getMessage() : t.toString()) + "\n" + sw.toString();
         }
 
-        testResult.put("Message", consoleOutput);
-
+        testResult.put("Message", message);
         testCases.add(testResult);
     }
-
-    private String captureConsoleOutput() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baos);
-        PrintStream oldOut = System.out;
-
-        try {
-            System.setOut(ps);
-            System.out.flush();
-        } finally {
-            System.setOut(oldOut);
-        }
-
-        return baos.toString();
-    }
-
 
     private void saveResultsToJson() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         List<Map<String, Object>> existingRuns = new ArrayList<>();
 
+        File targetDir = new File("target");
+        if (!targetDir.exists()) {
+            targetDir.mkdirs();
+        }
+
         // Read existing runs if file exists
         File file = new File(JSON_FILE_PATH);
-        if (file.exists()) {
-            try (Reader reader = new FileReader(JSON_FILE_PATH)) {
+        if (file.exists() && file.length() > 0) {
+            try (Reader reader = new FileReader(file)) {
                 Type listType = new TypeToken<List<Map<String, Object>>>() {}.getType();
-                existingRuns = gson.fromJson(reader, listType);
-            } catch (IOException e) {
-                e.printStackTrace();
+                List<Map<String, Object>> loaded = gson.fromJson(reader, listType);
+                if (loaded != null) {
+                    existingRuns = loaded;
+                }
+            } catch (Exception e) {
+                System.err.println("Could not parse existing test results, creating new list: " + e.getMessage());
             }
         }
 
         // Store a single test run
         long endTime = System.currentTimeMillis();
         Map<String, Object> testRun = new HashMap<>();
-        testRun.put("Run ID", UUID.randomUUID().toString()); // Unique run ID
+        testRun.put("Run ID", UUID.randomUUID().toString());
         testRun.put("Execution Date", DATE_FORMAT.format(new Date(startTime)));
         testRun.put("Total Time", formatTimeSpan(endTime - startTime));
         testRun.put("Total Test Cases", testCases.size());
@@ -121,11 +119,11 @@ public class TestResultListener implements ITestListener {
         existingRuns.add(testRun);
 
         // Write back to JSON
-        try (FileWriter writer = new FileWriter(JSON_FILE_PATH)) {
+        try (FileWriter writer = new FileWriter(file)) {
             gson.toJson(existingRuns, writer);
             System.out.println("Test run results saved to " + JSON_FILE_PATH);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Failed to write test results JSON: " + e.getMessage());
         }
     }
 
